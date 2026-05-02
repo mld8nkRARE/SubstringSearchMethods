@@ -17,32 +17,32 @@ namespace SubstringSearch
             if (string.IsNullOrEmpty(pattern) || string.IsNullOrEmpty(text))
                 return result;
 
-            int m = pattern.Length;
-            int n = text.Length;
+            int patternLength = pattern.Length;
+            int textLength = text.Length;
 
-            if (m > n) return result;
+            if (patternLength > textLength) return result;
 
-            int[] badChar = BuildBadCharTable(pattern);
-            int[] goodSuffix = BuildGoodSuffixTable(pattern);
+            int[] badCharTable = BuildBadCharTable(pattern);
+            int[] goodSuffixTable = BuildGoodSuffixTable(pattern);
 
             int shift = 0;
 
-            while (shift <= n - m)
+            while (shift <= textLength - patternLength)
             {
-                int j = m - 1;
+                int comparisonIndex = patternLength - 1;
 
-                while (j >= 0 && pattern[j] == text[shift + j])
-                    j--;
+                while (comparisonIndex >= 0 && pattern[comparisonIndex] == text[shift + comparisonIndex])
+                    comparisonIndex--;
 
-                if (j < 0)
+                if (comparisonIndex < 0)
                 {
                     result.Add(shift);
-                    shift += goodSuffix[0];
+                    shift += goodSuffixTable[0];
                 }
                 else
                 {
-                    int badCharShift = j - badChar[text[shift + j]];
-                    int goodSuffixShift = goodSuffix[j];
+                    int badCharShift = comparisonIndex - badCharTable[text[shift + comparisonIndex]];
+                    int goodSuffixShift = goodSuffixTable[comparisonIndex];
 
                     shift += Math.Max(1, Math.Max(badCharShift, goodSuffixShift));
                 }
@@ -66,59 +66,59 @@ namespace SubstringSearch
 
         private int[] BuildGoodSuffixTable(string pattern)
         {
-            int m = pattern.Length;
-            int[] goodSuffix = new int[m];
-            int[] suffixes = new int[m];
+            int patternLength = pattern.Length;
+            int[] goodSuffix = new int[patternLength];
+            int[] suffixes = new int[patternLength];
 
             ComputeSuffixes(pattern, suffixes);
 
-            for (int i = 0; i < m; i++)
-                goodSuffix[i] = m;
+            for (int i = 0; i < patternLength; i++)
+                goodSuffix[i] = patternLength;
 
-            int j = 0;
-            for (int i = m - 1; i >= 0; i--)
+            int suffixIndex = 0;
+            for (int i = patternLength - 1; i >= 0; i--)
             {
                 if (suffixes[i] == i + 1)
                 {
-                    for (; j < m - 1 - i; j++)
+                    for (; suffixIndex < patternLength - 1 - i; suffixIndex++)
                     {
-                        if (goodSuffix[j] == m)
-                            goodSuffix[j] = m - 1 - i;
+                        if (goodSuffix[suffixIndex] == patternLength)
+                            goodSuffix[suffixIndex] = patternLength - 1 - i;
                     }
                 }
             }
 
-            for (int i = 0; i <= m - 2; i++)
-                goodSuffix[m - 1 - suffixes[i]] = m - 1 - i;
+            for (int i = 0; i <= patternLength - 2; i++)
+                goodSuffix[patternLength - 1 - suffixes[i]] = patternLength - 1 - i;
 
             return goodSuffix;
         }
 
         private void ComputeSuffixes(string pattern, int[] suffixes)
         {
-            int m = pattern.Length;
-            suffixes[m - 1] = m;
+            int patternLength = pattern.Length;
+            suffixes[patternLength - 1] = patternLength;
 
-            int g = m - 1;
-            int f = 0;
+            int matchEnd = patternLength - 1;
+            int matchStart = 0;                    
 
-            for (int i = m - 2; i >= 0; i--)
+            for (int currentIndex = patternLength - 2; currentIndex >= 0; currentIndex--)
             {
-                if (i > g && suffixes[i + m - 1 - f] < i - g)
+                if (currentIndex > matchEnd && suffixes[currentIndex + patternLength - 1 - matchStart] < currentIndex - matchEnd)
                 {
-                    suffixes[i] = suffixes[i + m - 1 - f];
+                    suffixes[currentIndex] = suffixes[currentIndex + patternLength - 1 - matchStart];
                 }
                 else
                 {
-                    if (i < g)
-                        g = i;
+                    if (currentIndex < matchEnd)
+                        matchEnd = currentIndex;
 
-                    f = i;
+                    matchStart = currentIndex;
 
-                    while (g >= 0 && pattern[g] == pattern[g + m - 1 - f])
-                        g--;
+                    while (matchEnd >= 0 && pattern[matchEnd] == pattern[matchEnd + patternLength - 1 - matchStart])
+                        matchEnd--;
 
-                    suffixes[i] = f - g;
+                    suffixes[currentIndex] = matchStart - matchEnd;
                 }
             }
         }

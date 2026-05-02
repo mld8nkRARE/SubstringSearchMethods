@@ -28,6 +28,7 @@ class Program
             Console.WriteLine($"Найдено: {result.Count}");
             Console.WriteLine($"Время: {sw.ElapsedMilliseconds} ms");
             Console.WriteLine();
+            
         }
     }
 }
