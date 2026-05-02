@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        string pattern = "анна";
+        string pattern = "Анна";
 
         string text = File.ReadAllText("anna.txt", Encoding.UTF8);
 

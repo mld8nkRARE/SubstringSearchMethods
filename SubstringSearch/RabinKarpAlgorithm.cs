@@ -8,18 +8,13 @@ namespace SubstringSearch
 {
     public class RabinKarpAlgorithm : ISubstringSearch
     {
-        private const int alphabetPower = 256;
-        private const int mod = 10267;
 
         public List<int> IndexesOf(string pattern, string text)
         {
-            if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(pattern))
-                return new List<int>();
-
-            if (pattern.Length > text.Length)
-                return new List<int>();
-
             var result = new List<int>();
+            if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(pattern))
+                return result;
+
 
             const int alphabetSize = 256;
             const int mod = 35317;
